@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<head>
+    <style>
+		body {
+			font-family: Arial, Helvetica, sans-serif;
+			padding: 0px;
+			margin: 0px;
+		}
+
+		#box {
+		   -webkit-user-select: none; /* Webkit */
+		   -moz-user-select: none; /* Firefox */
+		   -ms-user-select: none; /* Internet Explorer */
+		   user-select: none; /* Standard */
+		    
+			width: 50px;
+			height: 50px;
+			border-radius: 25px;
+			background-color: gray;
+		}
+		
+		#bounding-box {
+			border: 1px solid black;
+			position: relative;
+			width: 200px;
+			height: 200px;
+			border-radius: 200px;
+		}
+
+		#ConnectionStatusContainer {
+			text-align: center;
+			background-color: #e28743;
+			padding: 10px;
+		}
+    </style>
+</head>
+<body>
+
+<div>
+	<div id="ConnectionStatusContainer">
+		Connection Status: <span id="ConnectionStatus">Disconnected</span>
+	</div>
+</div>
+
+<div id="leftstickcontainer" style="margin: 20px;">
+	<div id="bounding-box">
+		<div id="box" style="position: absolute;"></div>
+
+        <div style="margin-top: 250px;"><button id="horn" type="button">beep!</button></div>
+		
+		<div id="values" style="margin-top: 250px;">
+			<p id="x-offset"></p>
+			<p id="y-offset"></p>
+			
+			<p id="vector"></p>
+			<p id="magnitudeLabel"></p>
+			<p id="radiansLabel"></p>
+		</div>
+	</div>
+</div>
+
+<script>
+
+	var ws;
+
+	const ConnectionState = {
+		Connected: 'Connected',
+		Disconnected: 'Disconnected'
+	};
+
+	function connectWebSocket(serverAddress)
+	{
+		ws = new WebSocket(serverAddress);
+
+		ws.onopen = () => {
+			showConnectionStatus(ConnectionState.Connected);
+		};
+	
+		ws.onclose = () => {
+			showConnectionStatus(ConnectionState.Disconnected);
+			setTimeout(() => { connectWebSocket(serverAddress); }, 1000);
+		};
+	}
+	
+	connectWebSocket("ws://servertwo:8765");
+
+	function showConnectionStatus(connectionState) {
+		var connectionStatusLabel = document.getElementById("ConnectionStatus");
+		switch(connectionState)
+		{
+			case(ConnectionState.Connected):
+				console.log("WebSocket connection opened");
+				connectionStatusLabel.innerHTML = "Connected";
+				break;
+				
+			case(ConnectionState.Disconnected):
+				console.log("WebSocket connection closed");
+				connectionStatusLabel.innerHTML = "Disconnected";
+				break;
+		}
+	}
+
+	function startTimeout(millisecondsTimeout) {
+		return setTimeout(() => {
+			if(currentReadings.r != 0 && currentReadings.m != 0)
+			{
+				sendToServer(currentReadings.r, currentReadings.m);
+				startTimeout(millisecondsTimeout);
+			}
+		}, millisecondsTimeout);
+	}
+
+	var keepAliveTimeout;
+
+	var box = document.getElementById("box");
+	var boundingBox = document.getElementById("bounding-box");
+	var xOffset = document.getElementById("x-offset");
+	var yOffset = document.getElementById("y-offset");
+	var horn = document.getElementById("horn");
+	
+	var offset = { x: 0, y: 0 };
+	var radius = 100;
+	var startPos = { x: 0, y: 0 };
+	var currentReadings = { r: 0, v: 0, h: false };
+
+	startPos.x = (boundingBox.offsetWidth - box.offsetWidth) / 2;
+	startPos.y = (boundingBox.offsetHeight - box.offsetHeight) / 2;
+	box.style.left = startPos.x + "px";
+	box.style.top = startPos.y + "px";
+
+	horn.addEventListener("mousedown", (event) => {
+		sendHorn(true);
+		horn.addEventListener("mouseup", stopHorn);
+	});
+
+	function stopHorn()
+	{
+		sendHorn(false);
+		horn.removeEventListener("mouseup", stopHorn);
+	}
+
+	box.addEventListener("mousedown", (event) => {
+		event.preventDefault();
+		offset.x = event.clientX - box.offsetLeft;
+		offset.y = event.clientY - box.offsetTop;
+		document.addEventListener("mousemove", move);
+		document.addEventListener("mouseup", stop);
+	});
+
+	function move(event) {
+	
+		clearTimeout(keepAliveTimeout);
+		keepAliveTimeout = startTimeout(100);
+	
+		let x = event.clientX - offset.x;
+		let y = event.clientY - offset.y;
+		let distance = Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2));
+		let magnitude = distance;
+		
+		let radians = Math.atan2(x - startPos.x, -y - -startPos.y);
+		if(distance > radius){
+			x = startPos.x + (x - startPos.x) * radius / distance;
+			y = startPos.y + (y - startPos.y) * radius / distance;
+			magnitude = radius;
+		}
+		box.style.left = x + "px";
+		box.style.top = y + "px";
+		
+		updateLabels(x, y, radians, magnitude);
+		sendToServer(radians, magnitude);
+	}
+
+	function stop() {
+		document.removeEventListener("mousemove", move);
+		document.removeEventListener("mouseup", stop);
+		box.style.left = startPos.x + "px";
+		box.style.top = startPos.y + "px";
+		
+		updateLabels(startPos.x, startPos.y, 0, 0);
+		sendToServer(0, 0);
+	}
+
+	function updateLabels(x, y, radians, magnitude) {
+		xOffset.innerHTML = "X offset: " + roundForDisplay(x - startPos.x);
+		yOffset.innerHTML = "Y offset: " + roundForDisplay(y - startPos.y);
+		
+		magnitudeLabel.innerHTML = "Magnitude: " + roundForDisplay(magnitude);
+//		angleLabel.innerHTML = "Angle: " + (Math.atan2(x - startPos.x, y - startPos.y) * 180 / Math.PI) + "°";
+		radiansLabel.innerHTML = "Radians: " + roundForDisplay(radians);
+	}
+
+	function roundForDisplay(value) {
+		return value.toFixed(2);
+	}
+	
+	function sendHorn(horn) {
+		var message = { r: 0, m: 0, h: horn};
+		ws.send(JSON.stringify(message));
+	}
+
+	function sendToServer(radians, magnitude) {
+		currentReadings.r = radians;
+		currentReadings.m = magnitude;
+	
+		var message = { r: radians, m: magnitude, h: false};
+		ws.send(JSON.stringify(message));
+	}
+
+</script>
+</body>
+</html>
