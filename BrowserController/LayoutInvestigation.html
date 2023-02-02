@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>Layout Investigation.</title>
+        <style>
+            .parent {
+                display: grid;
+                grid-template-columns: repeat(3, 150px);
+                grid-template-rows: repeat(2, 150px);
+                grid-gap: 1rem;
+                justify-items: center;
+                align-items: center;
+            }
+
+            .parent > div {
+                border-radius: 5px;
+                padding: 10px;
+                background-color: rgb(207,232,220);
+                border: 2px solid rgb(79,185,227);
+            }
+
+            #dpad {
+                grid-area: 1 / 1 / 2 / 2;
+                text-align: center;
+            }
+            #buttons {
+                grid-area: 1 / 3 / 2 / 4;
+                text-align: center;
+            }
+            #leftAnalog {
+                grid-area: 2 / 1 / 3 / 2; 
+                text-align: center;
+            }
+            #rightAnalog {
+                grid-area: 2 / 3 / 3 / 4;
+                text-align: center;
+            }
+            #center {
+                grid-area: 1 / 2 / 3 / 3;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="parent">
+            <div id="dpad">D Pad</div>
+            <div id="buttons">
+                <div class="button">1</div>
+                <div class="button">2</div>
+                <div class="button">3</div>
+                <div class="button">4</div>
+            </div>
+            <div id="leftAnalog">Left<br />Analogue</div>
+            <div id="rightAnalog">Right<br />Analogue</div>
+            <div id="center">Centre</div>
+        </div>
+
+    </body>
+</html>
