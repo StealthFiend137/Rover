@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "BrowserController"
+		},
+		{
+			"path": "WebsocketServer"
+		},
+		{
+			"path": "Firmware"
+		}
+	],
+	"settings": {}
+}
