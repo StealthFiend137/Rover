@@ -5,28 +5,24 @@
 #include <secrets/wifi.h>
 #include <secrets/mqtt.h>
 #include <ArduinoJson.h>
+#include "handlers/HornMessageHandler.cpp"
+#include "handlers/MovementMessageHandler.cpp"
 
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
-
-const char* mqttServer = MQTT_SERVER;
-const int mqttPort = MQTT_PORT;
-const char* mqttUser = MQTT_USER;
-const char* mqttPassword = MQTT_PASSWORD;
-const char* topic = MQTT_TOPIC;
+#define HORNPIN = D2;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-int ledPin = LED_BUILTIN;
+MessageHandlers::HornMessageHandler hornHandler = MessageHandlers::HornMessageHandler(D2);
+MessageHandlers::MovementMessageHandler movementHandler = MessageHandlers::MovementMessageHandler();
 
 void setup_wifi() {
   delay(10);
   Serial.println();
   Serial.print("Connecting to ");
-  Serial.println(ssid);
+  Serial.println(WIFI_SSID);
 
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -40,13 +36,6 @@ void setup_wifi() {
 }
 
 void callback(char* topic, byte* message, unsigned int length) {
-  //int state = message[0] - '0';
-  //digitalWrite(ledPin, state);
-  
-  Serial.println("Message Received:");
-  Serial.write(message, length);
-  Serial.println();
-  
   StaticJsonDocument<200> doc;
   DeserializationError error = deserializeJson(doc, message);
 
@@ -55,32 +44,26 @@ void callback(char* topic, byte* message, unsigned int length) {
     return;
   }
 
-  if(doc["h"])
-  {
-    //tone(D2, 300, 500);
-    tone(D2, 300);
-  }
-  else
-  {
-    noTone(D2);
-  }
-  
+  // Get the appropriate handlers for this message, and action them.
+  hornHandler.handle(doc);
+
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(ledPin, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+  
   setup_wifi();
-  client.setServer(mqttServer, mqttPort);
+  client.setServer(MQTT_SERVER, MQTT_PORT);
   client.setCallback(callback);
 }
 
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("ESP8266Client", mqttUser, mqttPassword)) {
+    if (client.connect("ESP8266Client", MQTT_USER, MQTT_PASSWORD)) {
       Serial.println("connected");
-      client.subscribe(topic);
+      client.subscribe(MQTT_TOPIC);
       
       tone(D2, 500, 200);
       delay(200);
