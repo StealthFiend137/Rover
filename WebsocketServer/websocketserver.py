@@ -8,10 +8,12 @@ async def handle(websocket, path):
         try:
             message = await websocket.recv()
             data = json.loads(message)
-            print(f"received: x={data['r']}, y={data['m']}, h={data['h']}")
+            print(f"received: r={data['r']}, m={data['m']}, h={data['h']}")
             
             sendData = {
-                "h" : data['h']
+                "h" : data['h'],
+                "r" : data['m'],
+                "m" : data['r']
             }
             client.publish("buggy", json.dumps(sendData))
 
@@ -29,6 +31,7 @@ def on_disconnect(client, userdata, rc):
 listen_address = "0.0.0.0"
 listen_port = 8765
 start_server = websockets.serve(handle, listen_address, listen_port)
+print("\nMovement support version\n")
 print(f"Listening for websocket traffic on: {listen_address}:{listen_port}")
 
 client = mqtt.Client()
