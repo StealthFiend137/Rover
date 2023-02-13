@@ -2,11 +2,27 @@ import asyncio
 import json
 import websockets
 import paho.mqtt.client as mqtt
+import math
 
 def calculate_wheel_speeds(data):
+    
+    angle = data['r']
+    magnitude = data['m']
+    
+    leftSpeed = magnitude * math.cos(angle - math.pi / 4)
+    rightSpeed = magnitude * math.cos(angle + math.pi / 4)
+    
+    if angle < math.pi / 4:
+        if magnitude < 1:
+            leftSpeed *= 1 / (1 - magnitude)
+            rightSpeed *= 1 / (1 - magnitude)
+        elif:
+            leftSpeed = 1
+            rightSpeed = 1
+
     return {
-        "left" : 0,
-        "right" : 0
+        "left" : int(leftSpeed * 32_767),
+        "right" : int(rightSpeed * 32_767)
     }
 
 def generate_buggycall(data):
