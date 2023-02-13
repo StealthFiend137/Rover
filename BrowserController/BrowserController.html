@@ -147,6 +147,10 @@
 		document.addEventListener("mouseup", stop);
 	});
 
+	function scale (number, inMin, inMax, outMin, outMax) {
+		return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+	}
+
 	function move(event) {
 	
 		clearTimeout(keepAliveTimeout);
@@ -163,6 +167,9 @@
 			y = startPos.y + (y - startPos.y) * radius / distance;
 			magnitude = radius;
 		}
+
+		magnitude = scale(magnitude, 0, 100, 0, 1);
+
 		box.style.left = x + "px";
 		box.style.top = y + "px";
 		
