@@ -26,8 +26,8 @@ namespace MessageHandlers
             // Serial.println("Radians: " + String(radians) + " Magnitude:" + String(magnitude) + "x:" + String(x) + " y:" + String(y));
 
             const float MAX_SPEED = 255.0f;
-            *leftSpeedPtr = (y * MAX_SPEED - x * MAX_SPEED / 2.0f);
-            *rightSpeedPtr = -(y * MAX_SPEED + x * MAX_SPEED / 2.0f);
+            *leftSpeedPtr = (y * MAX_SPEED - x * MAX_SPEED);
+            *rightSpeedPtr = -(y * MAX_SPEED + x * MAX_SPEED);
             
             Serial.println("Left Speed: " + String(*leftSpeedPtr) + " Right Speed: " + String(*rightspeedPtr));
         }
