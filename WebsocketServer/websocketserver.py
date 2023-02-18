@@ -8,21 +8,22 @@ def calculate_wheel_speeds(data):
     
     angle = data['r']
     magnitude = data['m']
+        
+    x = math.cos(angle)
+    y = math.sin(angle)
     
-    leftSpeed = magnitude * math.cos(angle - math.pi / 4)
-    rightSpeed = magnitude * math.cos(angle + math.pi / 4)
-    
-    if angle < math.pi / 4:
-        if magnitude < 1:
-            leftSpeed *= 1 / (1 - magnitude)
-            rightSpeed *= 1 / (1 - magnitude)
-        elif:
-            leftSpeed = 1
-            rightSpeed = 1
+    left_speed = y
+    right_speed = y
+    if x < 0:
+        left_speed = y + x
+        right_speed = y - x
+        
+    left_speed = magnitude * left_speed
+    right_speed = magnitude * right_speed
 
     return {
-        "left" : int(leftSpeed * 32_767),
-        "right" : int(rightSpeed * 32_767)
+        "left" : int(left_speed * 255),
+        "right" : int(right_speed * 255)
     }
 
 def generate_buggycall(data):
