@@ -4,28 +4,46 @@ import websockets
 import paho.mqtt.client as mqtt
 import math
 
+
+def get_x_range(theta):
+    adjacent_length = 1
+    if (abs(theta) < (math.pi / 4)) or (abs(theta) > (math.pi -(math.pi /4))):
+        return adjacent_length / math.cos(theta)
+    return adjacent_length / math.sin(theta)
+
+def get_y_range(theta):
+    adjacent_length = 1
+    if (abs(theta) > (math.pi / 4)) or (abs(theta) < (math.pi -(math.pi /4))):
+        return adjacent_length / math.cos(theta)
+    return adjacent_length / math.sin(theta)
+
+def x_and_y_from_theta_and_magnitude(theta, magnitude):
+            
+    # range -1 to 1
+    x = math.cos(theta) 
+    y = math.sin(theta) 
+       
+    x_range = get_x_range(theta)
+    y_range = get_y_range(theta)
+    
+    print(x, y, y_range)
+    
+    return x, y
+
 def calculate_wheel_speeds(data):
     
     angle = data['r']
     magnitude = data['m']
-        
-    x = math.cos(angle)
-    y = math.sin(angle)
+    x, y = x_and_y_from_theta_and_magnitude(angle, magnitude)
     
-    print(x, y)
     
-    left_speed = y
-    right_speed = y
-    if x < 0:
-        left_speed = y + x
-        right_speed = y - x
-        
-    left_speed = magnitude * left_speed
-    right_speed = magnitude * right_speed
+
+    left_speed = 0
+    right_speed = 0
 
     return {
-        "l" : int(left_speed * 255),
-        "r" : int(right_speed * 255)
+        "l" : int(left_speed ),
+        "r" : int(right_speed )
     }
 
 def generate_buggycall(data):
