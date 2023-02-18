@@ -14,7 +14,7 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 MessageHandlers::HornMessageHandler hornHandler = MessageHandlers::HornMessageHandler(D2);
-MessageHandlers::MovementMessageHandler movementHandler = MessageHandlers::MovementMessageHandler();
+MessageHandlers::MovementMessageHandler movementHandler = MessageHandlers::MovementMessageHandler(D8, D7, D4, D6, D5, D3);
 
 void setup_wifi() {
   delay(10);
@@ -46,7 +46,7 @@ void callback(char* topic, byte* message, unsigned int length) {
 
   // Get the appropriate handlers for this message, and action them.
   hornHandler.handle(doc);
-
+  movementHandler.handle(doc);
 }
 
 void setup() {
@@ -75,13 +75,16 @@ void reconnect() {
       delay(5000);
     }
   }
-
-
 }
 
-void loop() {
+void mqttHandler()
+{
   if (!client.connected()) {
     reconnect();
   }
   client.loop();
+}
+
+void loop() {
+  mqttHandler();
 }
