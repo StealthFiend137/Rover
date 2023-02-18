@@ -17,13 +17,8 @@ namespace MessageHandlers
 
         void calculateSpeeds(const float radians, const float magnitude, int* leftSpeedPtr, int* rightspeedPtr)
         {
-            //*leftSpeedPtr = map(magnitude * cos(radians), 0, 100, -255, 255);;
-            //*rightSpeedPtr = map(magnitude * sin(radians), 0, 100, -255, 255);
-
             float x = magnitude * cos(radians);
             float y = magnitude * sin(radians);
-
-            // Serial.println("Radians: " + String(radians) + " Magnitude:" + String(magnitude) + "x:" + String(x) + " y:" + String(y));
 
             const float MAX_SPEED = 255.0f;
             *leftSpeedPtr = (y * MAX_SPEED - x * MAX_SPEED);
@@ -70,18 +65,8 @@ namespace MessageHandlers
         }
 
         void handle(const StaticJsonDocument<200> doc) {          
-            int leftSpeed = 0;
-            int rightSpeed = 0;
-
-            {
-                float r = doc["r"];
-                float m = doc["m"];
-
-                calculateSpeeds(r, m, leftSpeedPtr, rightSpeedPtr);
-                leftSpeed = *leftSpeedPtr;
-                rightSpeed = *rightSpeedPtr;
-            }
-            
+            int leftSpeed = doc["l"];
+            int rightSpeed = doc["r"];
             setLeftSpeed(leftSpeed);
             setRightspeed(rightSpeed);
         };

@@ -14,7 +14,7 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 MessageHandlers::HornMessageHandler hornHandler = MessageHandlers::HornMessageHandler(D2);
-MessageHandlers::MovementMessageHandler movementHandler = MessageHandlers::MovementMessageHandler(D5, D6, D3, D7, D8, D4);
+MessageHandlers::MovementMessageHandler movementHandler = MessageHandlers::MovementMessageHandler(D8, D7, D4, D6, D5, D3);
 
 void setup_wifi() {
   delay(10);
