@@ -12,6 +12,8 @@ def calculate_wheel_speeds(data):
     x = math.cos(angle)
     y = math.sin(angle)
     
+    print(x, y)
+    
     left_speed = y
     right_speed = y
     if x < 0:
@@ -22,46 +24,26 @@ def calculate_wheel_speeds(data):
     right_speed = magnitude * right_speed
 
     return {
-        "left" : int(left_speed * 255),
-        "right" : int(right_speed * 255)
+        "l" : int(left_speed * 255),
+        "r" : int(right_speed * 255)
     }
 
 def generate_buggycall(data):
-    deps = {
-                "h" : data['h'],
-                "r" : data['r'],
-                "m" : data['m']
-            }
-    
-    # we're now decoupling the heading and radians from the actual speed and direction of the buggy.
-    # the new format for the buggy messages are 'l' and 'r'
-    # with 'l' being the forward velocity of the left hand wheel
-    # and 'r' being the forward velocity of the right hand wheel
-    # so that we're further decoupling, the range is from -1 for full reverse, through 0 for stationary to 1 for full forwards.
-    
-    
-    
-    new = calculate_wheel_speeds(data)
-    
-    
-    return {**deps, **new}
+    anciliary = {
+        "h" : data['h']
+    }
+    movement = calculate_wheel_speeds(data)
+    return {**anciliary, **movement}
 
 async def handle(websocket, path):
     while True:
         try:
             message = await websocket.recv()
             data = json.loads(message)
-            # print(f"received: r={data['r']}, m={data['m']}, h={data['h']}")
-            
-            #sendData = {
-            #    "h" : data['h'],
-            #    "r" : data['r'],
-            #    "m" : data['m']
-            #}
             
             sendData = generate_buggycall(data)
             
-            print(json.dumps(sendData))
+            # print(json.dumps(sendData))
             client.publish("buggy", json.dumps(sendData))
 
         except websockets.exceptions.ConnectionClosed:
