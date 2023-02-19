@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "WebsocketServer"
+		},
+		{
+			"path": "WebServer"
 		}
 	],
 	"settings": {}
