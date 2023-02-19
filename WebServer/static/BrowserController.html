@@ -41,7 +41,7 @@
 		Connection Status: <span id="ConnectionStatus">Disconnected</span>
 	</div>
 	<div>
-		Version 1
+		Version 6
 	</div>
 </div>
 
@@ -149,25 +149,49 @@
 		horn.removeEventListener("touchstart", stopHorn);
 	}
 
-	box.addEventListener("mousedown", (event) => {
+	box.addEventListener("mousedown", start);
+	box.addEventListener("touchstart", start, { passive: false });
+
+	function start(event) {
 		event.preventDefault();
-		offset.x = event.clientX - box.offsetLeft;
-		offset.y = event.clientY - box.offsetTop;
-		document.addEventListener("mousemove", move);
-		document.addEventListener("mouseup", stop);
-	});
+		if (event.touches) {
+			// If the event is a touch event, use the first touch point
+			offset.x = event.touches[0].clientX - box.offsetLeft;
+			offset.y = event.touches[0].clientY - box.offsetTop;
+			document.addEventListener("touchmove", move, { passive: false });
+			document.addEventListener("touchend", stop);
+		} else {
+			// If the event is a mouse event, use the clientX and clientY properties
+			offset.x = event.clientX - box.offsetLeft;
+			offset.y = event.clientY - box.offsetTop;
+			document.addEventListener("mousemove", move);
+			document.addEventListener("mouseup", stop);
+		}
+	}
 
 	function scale (number, inMin, inMax, outMin, outMax) {
 		return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 	}
 
 	function move(event) {
-	
+		event.preventDefault();
+
+		x = 0;
+		y = 0;
+
+		if (event.touches) {
+		  // If the event is a touch event, use the first touch point
+		  x = event.touches[0].clientX - offset.x;
+		  y = event.touches[0].clientY - offset.y;
+		} else {
+		  // If the event is a mouse event, use the clientX and clientY properties
+		  x = event.clientX - offset.x;
+		  y = event.clientY - offset.y;
+		}
+
 		clearTimeout(keepAliveTimeout);
 		keepAliveTimeout = startTimeout(100);
 	
-		let x = event.clientX - offset.x;
-		let y = event.clientY - offset.y;
 		let distance = Math.sqrt(Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2));
 		let magnitude = distance;
 		
@@ -182,20 +206,31 @@
 
 		box.style.left = x + "px";
 		box.style.top = y + "px";
-		
+
 		updateLabels(x, y, radians, magnitude);
 		sendToServer(radians, magnitude);
 	}
 
-	function stop() {
-		document.removeEventListener("mousemove", move);
-		document.removeEventListener("mouseup", stop);
+	function stop(event) {
+		event.preventDefault();
+		if (event.touches) {
+		  // If the event is a touch event, remove the touchmove and touchend event listeners
+		  document.removeEventListener("touchmove", move);
+		  document.removeEventListener("touchend", stop);
+		} else {
+		  // If the event is a mouse event, remove the mousemove and mouseup event listeners
+		  document.removeEventListener("mousemove", move);
+		  document.removeEventListener("mouseup", stop);
+		}
+		
 		box.style.left = startPos.x + "px";
 		box.style.top = startPos.y + "px";
 		
 		updateLabels(startPos.x, startPos.y, 0, 0);
 		sendToServer(0, 0);
-	}
+	  }
+
+
 
 	function updateLabels(x, y, radians, magnitude) {
 		xOffset.innerHTML = "X offset: " + roundForDisplay(x - startPos.x);
