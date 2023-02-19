@@ -40,6 +40,9 @@
 	<div id="ConnectionStatusContainer">
 		Connection Status: <span id="ConnectionStatus">Disconnected</span>
 	</div>
+	<div>
+		Version 1
+	</div>
 </div>
 
 <div id="leftstickcontainer" style="margin: 20px;">
@@ -133,10 +136,17 @@
 		horn.addEventListener("mouseup", stopHorn);
 	});
 
+	horn.addEventListener("touchstart", (event) => {
+		event.preventDefault();
+		sendHorn(true);
+		horn.addEventListener("touchend", stopHorn);
+	});
+
 	function stopHorn()
 	{
 		sendHorn(false);
 		horn.removeEventListener("mouseup", stopHorn);
+		horn.removeEventListener("touchstart", stopHorn);
 	}
 
 	box.addEventListener("mousedown", (event) => {
