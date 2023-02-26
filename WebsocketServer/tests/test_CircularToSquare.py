@@ -31,11 +31,10 @@ class CircularToSquareTests(unittest.TestCase):
     def test_get_square_magnitude(self):
         test_cases = [
             (0, 1, 1), # north
-            ((math.pi) / 2, 1, 1), # east
-            ((math.pi), 1, 1), # south
-            ((-math.pi), 1, 1), # also south
-            ((-math.pi) / 2, 1, 1),  # west
-            
+            (math.pi / 2, 1, 1), # east
+            (math.pi, 1, 1), # south
+            (-math.pi, 1, 1), # also south
+            (-math.pi / 2, 1, 1),  # west
             ((math.pi) / 4, 1, 1.414), # north east
             ((math.pi) / 8, 1, 1.082), # north north east
         ]
@@ -45,21 +44,32 @@ class CircularToSquareTests(unittest.TestCase):
                 adjusted_magnitude = rangeofmotion.get_square_magnitude(theta)
                 self.assertAlmostEqual(expected_magnitude, adjusted_magnitude, places=3)
 
-    def xtest_extremeties_return_full_x_or_y(self):
+    def test_get_joystick_position(self):
         test_cases = [
-            (0, 1, 1),
-            #((math.pi / 4), 0, 1),
-            ((math.pi) / 2, -1, 1),
-            #((-math.pi) / 4, 0, -1)
+            (0, 1, 0, 1), # north
+            (math.pi / 2, 1, 1, 0), # east
+            (math.pi, 1, 0, -1), # south
+            (-math.pi, 1, 0, -1), # also south
+            (-math.pi / 2, 1, -1, 0),  # west
+            (math.pi / 4, 1.414, 1, 1), # north east
+            (math.pi / 8, 1.082, 0.414, 1), # north north east
+        ]
+        for theta, magnitude, expected_x, expected_y in test_cases:
+            with self.subTest(theta = theta, magnitude = magnitude, expected_x = expected_x, expected_y = expected_y):
+                actual_x, actual_y = rangeofmotion.get_joystick_position(theta, magnitude);
+                self.assertAlmostEqual(expected_x, actual_x, places=3)
+                self.assertAlmostEqual(expected_y, actual_y, places=3)
+                
+    def test_tank_stearing(self):
+        test_cases = [
+            (0, 1, 1, 1), # north
+            (1, 0, 1, -1), # east
+            (0, -1, -1, -1), # south
+            (-1, 0, -1, 1), # west
         ]
         
-        for theta, expected_x, expected_y in test_cases:
-            with self.subTest(theta = theta, expected_x = expected_x, expected_y = expected_y):
-                
-                magnitude = 1
-                actual_x, actual_y = rangeofmotion.circular_to_square(theta, magnitude)
-                self.assertEqual(expected_x, actual_x)
-                self.assertEqual(expected_y, actual_y)
-    
-    def dxiagonals_return_extreme_x_andy(self):
-        self.assertEqual(1, 2)
+        for x, y, expected_left, expected_right in test_cases:
+            with self.subTest(x = x, y = y, expected_left = expected_left, expected_right = expected_right):
+                actual_left, actual_right = rangeofmotion.joystick_position_to_tank(x, y)
+                self.assertAlmostEqual(expected_left, actual_left, places=3)
+                self.assertAlmostEqual(expected_right, actual_right, places=3)

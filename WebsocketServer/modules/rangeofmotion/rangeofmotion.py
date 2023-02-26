@@ -1,14 +1,24 @@
 import math
 
+def joystick_position_to_tank(x, y):
+    left = 0
+    right = 0
+    return left, right
+
 def circular_to_square(theta, magnitude):
     square_magnitude = get_square_magnitude(theta)   
-    
-    return 1, 0
+    normalized_magnitude = map_magnitude(magnitude, square_magnitude)
+    result = get_joystick_position(theta, normalized_magnitude)
+    return result
 
+def get_joystick_position(theta, magnitude):
+    """
+    Gets the x and y coordinates for a joystick based on the theta and magnitude.
+    """
+    x = math.sin(theta) * magnitude
+    y = math.cos(theta) * magnitude
 
-def SquareToCircular():
-    pass
-
+    return x, y
 
 def get_square_magnitude(theta):
     """
