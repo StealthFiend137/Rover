@@ -19,9 +19,9 @@ def map_circular_magnitude_to_circumstribed_square(circular_magnitude, outer_mag
     """
     
     if circular_magnitude > 1:
-        raise Exception(f'circular magnitude must be <= 1.  Actual value was { circular_magnitude }')
+        raise ValueError(f'circular magnitude must be <= 1.  Actual value was { circular_magnitude }')
     
     if circular_magnitude < 0:
-        raise Exception(f'circular magnitude must be > 0.  Actual value was { circular_magnitude }')
+        raise ValueError(f'circular magnitude must be > 0.  Actual value was { circular_magnitude }')
     
     return (circular_magnitude * outer_magnitude_upper_range)

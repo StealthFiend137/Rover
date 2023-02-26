@@ -26,7 +26,7 @@ class tCircularToSquareTests(unittest.TestCase):
         ]
         for value in test_cases:
             with self.subTest(value = value):
-                self.assertRaises(Exception, rangeofmotion.map_circular_magnitude_to_circumstribed_square, value, 1)
+                self.assertRaises(ValueError, rangeofmotion.map_circular_magnitude_to_circumstribed_square, value, 1)
             
     
 
