@@ -5,23 +5,22 @@ def SquareToCircular():
     pass
 
 
-
-def map_circular_magnitude_to_circumstribed_square(circular_magnitude, outer_magnitude_upper_range):
+def map_magnitude(value, new_range_maximum):
     """
-    Maps a smaller magnitude from a circle to a larger one on the square circumscribed to that circle.
+    maps a value that exists in the range 0 to 1 to a number that exists in the range 0 to 
     
     Args:
-        inner_magnitude: magnitude of a joystick in the range 0 to 1.
-        outer_magnitude_upper_range: the upper range of the out magnitude.
+        value: magnitude of a joystick in the range 0 to 1.
+        new_range_maximum: the upper range of the out magnitude.
         
     Returns:
         the mappings 
     """
     
-    if circular_magnitude > 1:
-        raise ValueError(f'circular magnitude must be <= 1.  Actual value was { circular_magnitude }')
+    if value > 1:
+        raise ValueError(f'circular magnitude must be <= 1.  Actual value was { value }')
     
-    if circular_magnitude < 0:
-        raise ValueError(f'circular magnitude must be > 0.  Actual value was { circular_magnitude }')
+    if value < 0:
+        raise ValueError(f'circular magnitude must be > 0.  Actual value was { value }')
     
-    return (circular_magnitude * outer_magnitude_upper_range)
+    return (value * new_range_maximum)

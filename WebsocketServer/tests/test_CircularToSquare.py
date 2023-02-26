@@ -16,7 +16,7 @@ class tCircularToSquareTests(unittest.TestCase):
         
         for high_bound, input, expected_result in test_cases:
             with self.subTest(high_bound = high_bound, input = input, expected_output = expected_result):
-                actual_result = rangeofmotion.map_circular_magnitude_to_circumstribed_square(input, high_bound)
+                actual_result = rangeofmotion.map_magnitude(input, high_bound)
                 self.assertEqual(expected_result, actual_result)
     
     def test_out_of_range_input_throws(self):
@@ -26,9 +26,8 @@ class tCircularToSquareTests(unittest.TestCase):
         ]
         for value in test_cases:
             with self.subTest(value = value):
-                self.assertRaises(ValueError, rangeofmotion.map_circular_magnitude_to_circumstribed_square, value, 1)
+                self.assertRaises(ValueError, rangeofmotion.map_magnitude, value, 1)
             
-    
 
     def xtest_extremeties_return_full_x_or_y(self):
         test_cases = [
