@@ -1,8 +1,29 @@
+import math
+
 def circular_to_square(theta, magnitude):
+    square_magnitude = get_square_magnitude(theta)   
+    
     return 1, 0
+
 
 def SquareToCircular():
     pass
+
+
+def get_square_magnitude(theta):
+    """
+    Gets the distance to the edge of square circumscribed of side 1.
+    
+    Args:
+        theta: the angle in radians to continue from the radius of he circle to the square.
+        
+    Returns:
+        a (float) indicating the distance to the edge of the square.
+    """
+    adjacent_length = 1
+    if (abs(theta) < (math.pi / 4)) or (abs(theta) > (math.pi -(math.pi /4))):
+        return abs(adjacent_length / math.cos(theta))
+    return abs(adjacent_length / math.sin(theta))
 
 
 def map_magnitude(value, new_range_maximum):

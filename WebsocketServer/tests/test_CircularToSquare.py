@@ -5,7 +5,7 @@ import math
 sys.path.append('../modules/rangeofmotion/')
 import rangeofmotion
 
-class tCircularToSquareTests(unittest.TestCase):
+class CircularToSquareTests(unittest.TestCase):
     
     def test_maping_of_numbers(self):
         test_cases = [
@@ -27,13 +27,29 @@ class tCircularToSquareTests(unittest.TestCase):
         for value in test_cases:
             with self.subTest(value = value):
                 self.assertRaises(ValueError, rangeofmotion.map_magnitude, value, 1)
+
+    def test_get_square_magnitude(self):
+        test_cases = [
+            (0, 1, 1), # north
+            ((math.pi) / 2, 1, 1), # east
+            ((math.pi), 1, 1), # south
+            ((-math.pi), 1, 1), # also south
+            ((-math.pi) / 2, 1, 1),  # west
             
+            ((math.pi) / 4, 1, 1.414), # north east
+            ((math.pi) / 8, 1, 1.082), # north north east
+        ]
+        
+        for theta, input_magnitude, expected_magnitude in test_cases:
+            with self.subTest(theta = theta, input_magnitude = input_magnitude, expected_magnitude = expected_magnitude):
+                adjusted_magnitude = rangeofmotion.get_square_magnitude(theta)
+                self.assertAlmostEqual(expected_magnitude, adjusted_magnitude, places=3)
 
     def xtest_extremeties_return_full_x_or_y(self):
         test_cases = [
-            (0, 1, 0),
+            (0, 1, 1),
             #((math.pi / 4), 0, 1),
-            ((math.pi) / 2, -1, 0),
+            ((math.pi) / 2, -1, 1),
             #((-math.pi) / 4, 0, -1)
         ]
         
