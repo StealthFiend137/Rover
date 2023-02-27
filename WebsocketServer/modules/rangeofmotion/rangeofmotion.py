@@ -1,8 +1,12 @@
 import math
 
 def joystick_position_to_tank(x, y):
-    left = 0
-    right = 0
+    left = x + y
+    right = y - x
+    
+    left = max(min(left, 1), -1)
+    right = max(min(right, 1), -1)
+    
     return left, right
 
 def circular_to_square(theta, magnitude):

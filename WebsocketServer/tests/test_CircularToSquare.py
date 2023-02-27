@@ -66,6 +66,9 @@ class CircularToSquareTests(unittest.TestCase):
             (1, 0, 1, -1), # east
             (0, -1, -1, -1), # south
             (-1, 0, -1, 1), # west
+            (1, 1, 1, 0), # north east
+            (0.75, 1, 1, 0.25), # north north east
+            (-1, -1, -1, 0), # south west
         ]
         
         for x, y, expected_left, expected_right in test_cases:
